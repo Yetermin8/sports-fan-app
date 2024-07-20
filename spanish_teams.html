@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <title>Spanish Teams</title>
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+   <link rel="stylesheet" href="styles.css">
+   <script src="script.js" defer></script>
+   <style>
+       .autocomplete-suggestions {
+           border: 1px solid #ddd;
+           background: #fff;
+           max-height: 200px;
+           overflow-y: auto;
+           position: absolute;
+           z-index: 1000;
+           width: calc(100% - 30px);
+       }
+       .autocomplete-suggestion {
+           padding: 10px;
+           cursor: pointer;
+       }
+       .autocomplete-suggestion:hover {
+           background: #f0f0f0;
+       }
+   </style>
+</head>
+<body class="light-mode">
+   <nav class="navbar navbar-expand-lg bg-dark navbar-dark">
+       <div class="container-fluid">
+           <a class="navbar-brand" href="#">Sports App</a>
+           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+               <span class="navbar-toggler-icon"></span>
+           </button>
+           <div class="collapse navbar-collapse" id="navbarNav">
+               <ul class="navbar-nav">
+                   <li class="nav-item"><a class="nav-link" href="sign_in.html">Sign In</a></li>
+                   <li class="nav-item"><a class="nav-link" href="sport_selection.html">Sports</a></li>
+                   <li class="nav-item"><a class="nav-link" href="league_selection.html">Leagues</a></li>
+                   <li class="nav-item"><a class="nav-link" href="calendar_invite.html">Calendar</a></li>
+               </ul>
+           </div>
+       </div>
+   </nav>
+   <div class="container mt-4">
+       <div class="d-flex justify-content-end mb-3">
+           <button id="increase-font" class="btn btn-secondary me-2">Increase Font Size</button>
+           <button id="decrease-font" class="btn btn-secondary me-2">Decrease Font Size</button>
+           <button id="theme-switcher" class="btn btn-secondary">Switch Theme</button>
+       </div>
+       <h2>Favorite Teams</h2>
+       <input type="text" id="search-bar" class="form-control mb-3" placeholder="Search and add favorite teams">
+       <div id="autocomplete-suggestions" class="autocomplete-suggestions"></div>
+       <div id="favorite-teams" class="row">
+       </div>
+   </div>
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+   <script>
+       document.addEventListener('DOMContentLoaded', function() {
+           const teams = [
+               { id: 'RM', name: 'Real Madrid CF', logo: 'images/Real Madrid.png', favorite: true },
+               { id: 'FCB', name: 'FC Barcelona', logo: 'images/Barcelona.jpg', favorite: true },
+               { id: 'ATM', name: 'Atlético de Madrid', logo: 'images/Atletico Madrid.jpg', favorite: true },
+               { id: 'GF', name: 'Getafe CF', logo: 'images/Getafe CF.png', favorite: false },
+               { id: 'AL', name: 'Almería', logo: 'images/UD Almería.png', favorite: false },
+           ];
+
+           const favoriteTeamsContainer = document.getElementById('favorite-teams');
+           const searchBar = document.getElementById('search-bar');
+           const autocompleteSuggestions = document.getElementById('autocomplete-suggestions');
+
+           function renderFavoriteTeams() {
+               favoriteTeamsContainer.innerHTML = '';
+               const favoriteTeams = teams.filter(team => team.favorite);
+
+               favoriteTeams.forEach(team => {
+                   favoriteTeamsContainer.innerHTML += `
+                       <div class="col-md-3" data-id="${team.id}">
+                           <div class="card">
+                               <img src="${team.logo}" class="card-img-top" alt="${team.name}">
+                               <div class="card-body">
+                                   <h5 class="card-title">${team.name}</h5>
+                                   <button class="btn btn-warning favorite-button" data-id="${team.id}">★</button>
+                               </div>
+                           </div>
+                       </div>
+                   `;
+               });
+
+               document.querySelectorAll('.favorite-button').forEach(button => {
+                   button.addEventListener('click', function() {
+                       const teamId = this.dataset.id;
+                       const team = teams.find(t => t.id === teamId);
+                       team.favorite = !team.favorite;
+                       renderFavoriteTeams();
+                   });
+               });
+           }
+
+           searchBar.addEventListener('input', function() {
+               const searchValue = this.value.toLowerCase();
+               autocompleteSuggestions.innerHTML = '';
+
+               if (searchValue) {
+                   const suggestions = teams.filter(team => team.name.toLowerCase().includes(searchValue) && !team.favorite);
+
+                   suggestions.forEach(team => {
+                       const suggestionItem = document.createElement('div');
+                       suggestionItem.classList.add('autocomplete-suggestion');
+                       suggestionItem.textContent = team.name;
+                       suggestionItem.addEventListener('click', function() {
+                           team.favorite = true;
+                           renderFavoriteTeams();
+                           searchBar.value = '';
+                           autocompleteSuggestions.innerHTML = '';
+                       });
+                       autocompleteSuggestions.appendChild(suggestionItem);
+                   });
+               }
+           });
+
+           renderFavoriteTeams();
+       });
+   </script>
+</body>
+</html>
